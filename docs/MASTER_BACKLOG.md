@@ -3,7 +3,13 @@
 Sequenced, epic-level backlog to drive GSMAXALL from foundation to production. Each epic lists its
 exit criteria. Status: `todo` / `in-progress` / `done`.
 
-## EPIC 0 — Foundation & Documentation  `in-progress`
+> **Progress note (live):** the app is deployed at https://gsmaxall.vercel.app with all 15 OS
+> module surfaces. Where a backend (Supabase, Qdrant, OpenHands sandbox, Stripe) isn't yet
+> connected, modules run in **demo/local mode** (localStorage persistence) and flip to live when
+> the credential/service is configured. Items below marked `partial` are code-complete on the
+> client with graceful fallback, pending their backend wiring.
+
+## EPIC 0 — Foundation & Documentation  `done`
 - [x] Audit sources; produce SYSTEM_AUDIT, FEATURE_MATRIX, GAP_ANALYSIS, DEPENDENCY_GRAPH,
       MERGE_MAP, TARGET_ARCHITECTURE, MASTER_BACKLOG.
 - [x] Scaffold monorepo (apps/web, services/*, packages/*, infrastructure).
@@ -11,28 +17,34 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 - [x] Provider-router contract + base adapters in `packages/sdk`.
 - [x] Local infra `docker-compose.yml` (Postgres, Qdrant, Redis).
 - [x] Runnable web shell with GSMAXALL branding + dark/light mode.
-- [ ] CI pipeline (build/lint/typecheck per workspace).
-- **Exit:** monorepo builds; web shell runs; docs merged.
+- [x] CI pipeline (GitHub Actions: JS build/lint/typecheck + Python pytest) — `.github/workflows/ci.yml`.
+- [x] One-shot pipeline script `scripts/gsmaxall.sh` (js | py | all).
+- **Exit:** monorepo builds; web shell runs; docs merged.  *(done)*
 
-## EPIC 1 — Identity & Tenancy  `todo`
-- [ ] Provision Supabase; wire web auth (sign-in/up, session).
+## EPIC 1 — Identity & Tenancy  `partial`
+- [x] Auth-gated app (sign-in screen) + session context (`app/lib/session.tsx`), Supabase-ready.
+- [x] Orgs + membership + RBAC roles; org switcher in header (`OrgMenu`).
+- [ ] Provision Supabase; swap demo identity for Supabase Auth (set NEXT_PUBLIC_SUPABASE_URL).
 - [ ] JWT verification middleware shared across services.
-- [ ] Orgs + membership + RBAC; org switcher in UI.
-- [ ] Audit log writer + viewer.
-- **Exit:** auth-gated app; org-scoped data; roles enforced.
+- [ ] Audit log writer + viewer (UI surface exists in Enterprise OS).
+- **Exit:** auth-gated app; org-scoped data; roles enforced.  *(demo identity live; Supabase pending B1)*
 
-## EPIC 2 — Chat OS (flagship vertical)  `todo`
-- [ ] Conversation persistence (Postgres).
-- [ ] Streaming chat via orchestrator → provider router.
-- [ ] Model selector from catalog; per-provider keys.
+## EPIC 2 — Chat OS (flagship vertical)  `partial`
+- [x] Multi-conversation chat with persistence (localStorage; sidebar, new/delete, auto-title).
+- [x] Streaming chat via provider router with demo fallback (`/api/chat`).
+- [x] Model selector from catalog (`/api/models`).
+- [ ] Move persistence to Postgres (per-org/user) once DB provisioned.
 - [ ] File upload + attachment rendering.
-- **Exit:** end-to-end multi-provider chat with history.
+- **Exit:** end-to-end multi-provider chat with history.  *(live; real models pending B2, DB pending B1)*
 
-## EPIC 3 — Memory & Knowledge OS  `todo`
-- [ ] `services/memory` Qdrant CRUD + semantic search.
-- [ ] `services/rag` ingest/chunk/embed/retrieve/cite.
-- [ ] Knowledge base UI (create KB, upload, query).
-- **Exit:** chat can ground answers on uploaded docs with citations.
+## EPIC 3 — Memory & Knowledge OS  `partial`
+- [x] Knowledge base UI (create KB, upload, list) + Memory search UI, persisted locally.
+- [x] `services/memory` semantic CRUD + cosine search (in-memory vector store, org-scoped, tested).
+- [x] `services/rag` ingest/chunk/embed/retrieve/cite (vector index, tested).
+- [x] **Qdrant** backend for `memory` + `rag` (org-scoped, payload-filtered) with in-memory fallback — set `QDRANT_URL`. No SQL.
+- [x] **Excel (.xlsx) + CSV ingestion**: rows parsed → embedded as vectors (`/v1/ingest/file`; Knowledge OS upload in web).
+- [ ] Provider embeddings (swap hashed embed for the provider router when a key is set).
+- **Exit:** chat can ground answers on uploaded docs with citations.  *(vector DB + Excel/CSV live; provider embeddings pending B2)*
 
 ## EPIC 4 — Developer OS  `todo`
 - [ ] Integrate OpenHands SDK in `services/agents` (sandboxed).
@@ -41,10 +53,11 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 - [ ] Terminal OS surface (sandboxed shell).
 - **Exit:** user issues a coding task; agent edits repo in sandbox and opens a PR.
 
-## EPIC 5 — Agent OS / Orchestration  `todo`
-- [ ] OpenClaw gateway-protocol + agent-core in orchestrator.
-- [ ] Tool registry bridging MCP + ACP; tool-call-repair.
-- [ ] Agent registry + capability discovery.
+## EPIC 5 — Agent OS / Orchestration  `partial`
+- [x] Orchestrator as unified API gateway: `/v1/models`, `/v1/tools`, `/v1/agents`, `/v1/chat`.
+- [x] Python provider router (resolve `provider/model`, demo fallback) with tests.
+- [x] Agent registry + tool registry (MCP + ACP protocols represented).
+- [ ] OpenClaw gateway-protocol + agent-core; tool-call-repair.
 - [ ] Multi-agent collaboration runner.
 - **Exit:** multiple agents coordinate on one task via shared tools.
 
@@ -53,21 +66,23 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 - [ ] Live link to `services/agents` workspace.
 - **Exit:** in-browser editing synced with agent runtime.
 
-## EPIC 7 — Workflow OS  `todo`
-- [ ] Workflow model (nodes, edges, triggers) + schema.
-- [ ] Scheduler + event triggers (Redis).
-- [ ] Visual builder in UI.
-- **Exit:** user automates a multi-step task on a schedule/trigger.
+## EPIC 7 — Workflow OS  `partial`
+- [x] Workflow builder UI (trigger/action steps, add/remove) persisted locally.
+- [x] `services/workflows` in-memory engine: create/list/run with a run log (tested).
+- [ ] Persist to Postgres; Redis-backed scheduler + event triggers.
+- **Exit:** user automates a multi-step task on a schedule/trigger.  *(builder + engine live; scheduler pending)*
 
 ## EPIC 8 — Builder OS  `todo`
 - [ ] App/site generation flow (Lovable/Bolt-style) on agents runtime.
 - [ ] Live preview + deploy.
 - **Exit:** user generates and previews an app from a prompt.
 
-## EPIC 9 — Research OS + Search  `todo`
-- [ ] `services/search` web/vector facade.
-- [ ] `services/research` multi-step research + synthesis with citations.
-- **Exit:** user runs a deep-research query and gets a sourced report.
+## EPIC 9 — Research OS + Search  `partial`
+- [x] Research/Content/Builder OS prompt surfaces wired to the provider router (demo fallback).
+- [x] `services/search` keyword + vector facade over an in-memory corpus (tested).
+- [x] `services/research` plan → gather → synthesize pipeline with citations (tested).
+- [ ] Back search with a real web/vector provider; synthesize via provider router in live mode.
+- **Exit:** user runs a deep-research query and gets a sourced report.  *(pipeline live; real sources pending)*
 
 ## EPIC 10 — Content & Media OS  `todo`
 - [ ] Content generation surfaces in UI.
@@ -80,7 +95,8 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 - [ ] Plugin/agent marketplace (plugin-sdk).
 - **Exit:** orgs can subscribe, manage members, install marketplace plugins.
 
-## EPIC 12 — Hardening & Launch  `todo`
+## EPIC 12 — Hardening & Launch  `partial`
+- [x] CI/CD (GitHub Actions) + full-stack `docker-compose.full.yml` (web-less; all services + infra).
 - [ ] Observability (OpenTelemetry), rate limits, quotas.
 - [ ] Security review (authz, sandbox isolation, secrets).
 - [ ] Load/perf testing; CI/CD; production deploy.

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  web:
+    name: JS workspace (build / lint / typecheck)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build
+
+  services:
+    name: Python services (pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-dev.txt "fastapi==0.115.6" "pydantic==2.10.4"
+      - name: Install service requirements
+        run: |
+          for req in services/*/requirements.txt; do pip install -r "$req"; done
+      - name: Run service test suites
+        run: |
+          set -e
+          for svc in services/*/; do
+            if [ -d "${svc}tests" ]; then
+              echo "::group::pytest ${svc}"
+              ( cd "$svc" && PYTHONPATH=. pytest -q )
+              echo "::endgroup::"
+            fi
+          done

@@ -14,6 +14,8 @@ import os
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from .router import chat as route_chat
+
 SERVICE_NAME = "orchestrator"
 SERVICE_PORT = int(os.environ.get("PORT", "8080"))
 
@@ -79,3 +81,20 @@ def list_tools() -> dict[str, list[Tool]]:
 @app.get("/v1/agents")
 def list_agents() -> dict[str, list[Agent]]:
     return {"agents": AGENT_REGISTRY}
+
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+
+class ChatRequest(BaseModel):
+    model: str
+    messages: list[ChatMessage]
+
+
+@app.post("/v1/chat")
+def chat(req: ChatRequest) -> dict:
+    """Unified gateway chat: resolves the model to a provider and returns a
+    completion (demo fallback when no provider key is configured)."""
+    return route_chat(req.model, [m.model_dump() for m in req.messages])

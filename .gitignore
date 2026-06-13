@@ -34,3 +34,4 @@ infrastructure/data/
 
 # next generated
 apps/web/next-env.d.ts
+.vercel
