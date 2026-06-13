@@ -51,6 +51,21 @@ export function AppShell({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
+        <div style={{ padding: 8, borderTop: "1px solid var(--gs-border)" }}>
+          <Link
+            href="/settings"
+            style={{
+              display: "block",
+              padding: "9px 12px",
+              borderRadius: 8,
+              fontSize: 14,
+              background: pathname === "/settings" ? "var(--gs-bg)" : "transparent",
+              color: pathname === "/settings" ? "var(--gs-text)" : "var(--gs-text-muted)",
+            }}
+          >
+            Settings
+          </Link>
+        </div>
       </aside>
 
       <main style={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
