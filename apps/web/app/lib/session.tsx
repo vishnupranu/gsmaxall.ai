@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 export type OrgRole = "owner" | "admin" | "member" | "viewer";
 
@@ -23,6 +24,7 @@ interface SessionState {
   currentOrg: Org | null;
   ready: boolean;
   supabaseConfigured: boolean;
+  supabase: SupabaseClient | null;
   signIn: (name: string, email: string) => void;
   signOut: () => void;
   setCurrentOrg: (orgId: string) => void;
@@ -44,17 +46,23 @@ function slug(s: string): string {
 
 /**
  * Auth + organization context. Supabase-ready: when NEXT_PUBLIC_SUPABASE_URL is
- * set the app should mount the Supabase client here; until then it runs a local
- * demo identity so every org-scoped surface is exercisable.
+ * set the app uses Supabase Auth; until then it runs a local demo identity.
  */
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const supabaseConfigured =
-    typeof process.env.NEXT_PUBLIC_SUPABASE_URL === "string" &&
-    process.env.NEXT_PUBLIC_SUPABASE_URL.length > 0;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+  const supabaseConfigured = Boolean(supabaseUrl && supabaseKey);
+
+  const supabase = useMemo(() => {
+    if (!supabaseConfigured) return null;
+    return createClient(supabaseUrl, supabaseKey);
+  }, [supabaseConfigured, supabaseUrl, supabaseKey]);
 
   const [persisted, setPersisted] = useState<Persisted | null>(null);
+  const [supabaseUser, setSupabaseUser] = useState<SessionUser | null>(null);
   const [ready, setReady] = useState(false);
 
+  // Load persisted demo session from localStorage
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -64,6 +72,37 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }
     setReady(true);
   }, []);
+
+  // If Supabase is configured, sync user from Supabase auth state
+  useEffect(() => {
+    if (!supabase) return;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const u = session.user;
+        setSupabaseUser({
+          id: u.id,
+          name: u.user_metadata?.full_name ?? u.email?.split("@")[0] ?? "User",
+          email: u.email ?? "",
+        });
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const u = session.user;
+        setSupabaseUser({
+          id: u.id,
+          name: u.user_metadata?.full_name ?? u.email?.split("@")[0] ?? "User",
+          email: u.email ?? "",
+        });
+      } else {
+        setSupabaseUser(null);
+      }
+    });
+
+    return () => { subscription.unsubscribe(); };
+  }, [supabase]);
 
   function persist(next: Persisted | null) {
     setPersisted(next);
@@ -75,29 +114,50 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Use Supabase user if configured, otherwise fall back to demo identity
+  const effectiveUser = supabaseConfigured ? supabaseUser : persisted?.user ?? null;
+
   const value = useMemo<SessionState>(() => {
-    const user = persisted?.user ?? null;
-    const orgs = persisted?.orgs ?? [];
+    const orgs = persisted?.orgs ?? (supabaseConfigured ? [] : []);
     const currentOrg = orgs.find((o) => o.id === persisted?.currentOrgId) ?? orgs[0] ?? null;
 
     return {
-      user,
+      user: effectiveUser,
       orgs,
       currentOrg,
       ready,
       supabaseConfigured,
-      signIn: (name, email) => {
-        const orgName = `${name.split(" ")[0] || "My"}'s Workspace`;
-        const org: Org = { id: `org_${slug(orgName)}`, name: orgName, role: "owner" };
-        const personal: Org = { id: "org_gsmaxall", name: "GSMAXALL", role: "member" };
-        persist({
-          user: { id: `usr_${slug(email)}`, name, email },
-          orgs: [org, personal],
-          currentOrgId: org.id,
-        });
-      },
-      signOut: () => persist(null),
-      setCurrentOrg: (orgId) =>
+      supabase,
+      signIn: supabaseConfigured
+        ? async (name: string, email: string) => {
+            if (!supabase) return;
+            const { error } = await supabase.auth.signInWithPassword({ email, password: "demo" });
+            if (error) {
+              // In demo mode, sign up creates a new user
+              await supabase.auth.signUp({ 
+                email, 
+                password: "demo", 
+                options: { data: { full_name: name } } 
+              });
+            }
+          }
+        : (name: string, email: string) => {
+            const orgName = `\${name.split(" ")[0] || "My"}'s Workspace`;
+            const org: Org = { id: `org_\${slug(orgName)}`, name: orgName, role: "owner" };
+            const personal: Org = { id: "org_gsmaxall", name: "GSMAXALL", role: "member" };
+            persist({
+              user: { id: `usr_\${slug(email)}`, name, email },
+              orgs: [org, personal],
+              currentOrgId: org.id,
+            });
+          },
+      signOut: supabaseConfigured
+        ? async () => {
+            if (supabase) await supabase.auth.signOut();
+            setSupabaseUser(null);
+          }
+        : () => persist(null),
+      setCurrentOrg: (orgId: string) =>
         setPersisted((prev) => {
           if (!prev) return prev;
           const next = { ...prev, currentOrgId: orgId };
@@ -109,7 +169,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           return next;
         }),
     };
-  }, [persisted, ready, supabaseConfigured]);
+  }, [persisted, ready, supabaseConfigured, supabase, effectiveUser]);
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }

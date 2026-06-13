@@ -13,8 +13,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@gsmaxall/types": "workspace:*",
-    "@gsmaxall/shared": "workspace:*"
+    "@gsmaxall/types": "file:../types",
+    "@gsmaxall/shared": "file:../shared"
   },
   "devDependencies": {
     "@types/node": "^20.17.6",

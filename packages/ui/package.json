@@ -18,7 +18,7 @@
     "react-dom": "^18.3.1"
   },
   "dependencies": {
-    "@gsmaxall/types": "workspace:*"
+    "@gsmaxall/types": "file:../types"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",

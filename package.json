@@ -3,10 +3,11 @@
   "private": true,
   "version": "0.1.0",
   "description": "GSMAXALL — one unified AI Operating System",
-  "packageManager": "pnpm@9.15.1",
-  "engines": {
-    "node": ">=20"
-  },
+  "packageManager": "npm@10.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",

@@ -11,10 +11,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@gsmaxall/sdk": "workspace:*",
-    "@gsmaxall/shared": "workspace:*",
-    "@gsmaxall/types": "workspace:*",
-    "@gsmaxall/ui": "workspace:*",
+    "@gsmaxall/sdk": "file:../sdk",
+    "@gsmaxall/shared": "file:../shared",
+    "@gsmaxall/types": "file:../types",
+    "@gsmaxall/ui": "file:../ui",
+    "@monaco-editor/react": "^4.7.0",
+    "@supabase/supabase-js": "^2.108.1",
     "next": "14.2.21",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
