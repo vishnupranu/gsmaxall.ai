@@ -38,8 +38,9 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 
 ## EPIC 3 — Memory & Knowledge OS  `partial`
 - [x] Knowledge base UI (create KB, upload, list) + Memory search UI, persisted locally.
-- [ ] `services/memory` Qdrant CRUD + semantic search (backend).
-- [ ] `services/rag` ingest/chunk/embed/retrieve/cite (backend).
+- [x] `services/memory` semantic CRUD + cosine search (in-memory vector store, org-scoped, tested).
+- [x] `services/rag` ingest/chunk/embed/retrieve/cite (in-memory index, tested).
+- [ ] Swap in-memory store for Qdrant + provider embeddings (set QDRANT_URL).
 - **Exit:** chat can ground answers on uploaded docs with citations.  *(UI live; vector backend pending)*
 
 ## EPIC 4 — Developer OS  `todo`
@@ -49,10 +50,11 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 - [ ] Terminal OS surface (sandboxed shell).
 - **Exit:** user issues a coding task; agent edits repo in sandbox and opens a PR.
 
-## EPIC 5 — Agent OS / Orchestration  `todo`
-- [ ] OpenClaw gateway-protocol + agent-core in orchestrator.
-- [ ] Tool registry bridging MCP + ACP; tool-call-repair.
-- [ ] Agent registry + capability discovery.
+## EPIC 5 — Agent OS / Orchestration  `partial`
+- [x] Orchestrator as unified API gateway: `/v1/models`, `/v1/tools`, `/v1/agents`, `/v1/chat`.
+- [x] Python provider router (resolve `provider/model`, demo fallback) with tests.
+- [x] Agent registry + tool registry (MCP + ACP protocols represented).
+- [ ] OpenClaw gateway-protocol + agent-core; tool-call-repair.
 - [ ] Multi-agent collaboration runner.
 - **Exit:** multiple agents coordinate on one task via shared tools.
 

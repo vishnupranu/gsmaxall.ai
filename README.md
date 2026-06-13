@@ -51,7 +51,21 @@ pnpm --filter @gsmaxall/web dev  # http://localhost:3000
 
 # 4. (optional) run a Python service
 cd services/orchestrator && pip install -r requirements.txt && uvicorn app.main:app --reload
+
+# 5. run the Python service tests
+pip install -r requirements-dev.txt
+( cd services/memory       && PYTHONPATH=. pytest -q )
+( cd services/rag          && PYTHONPATH=. pytest -q )
+( cd services/orchestrator && PYTHONPATH=. pytest -q )
 ```
+
+### Functional services
+
+- **orchestrator** — unified API gateway: `/v1/models`, `/v1/tools`, `/v1/agents`, and `/v1/chat`
+  (resolves `provider/model` via the Python provider router with a demo fallback).
+- **memory** — semantic memory: `/v1/memories` (upsert/list/delete) + `/v1/memories/search`
+  (cosine over an in-memory vector store; swap to Qdrant via `QDRANT_URL`).
+- **rag** — Knowledge OS backend: `/v1/ingest` (chunk + embed) and `/v1/query` (retrieve + cite).
 
 ## Deploy (Vercel)
 
@@ -72,5 +86,9 @@ Foundation + product surface: documentation, monorepo scaffold, unified schema, 
 contract, and a branded web app exposing **all 15 OS modules**. Chat OS streams via the unified
 router with a demo fallback; Developer/Research/Content/Builder OS are prompt-driven; Knowledge,
 Memory, Agent, Terminal, Workflow, Media OS are interactive; IDE/Business/Marketplace/Enterprise OS
-render their product surfaces. See `docs/MASTER_BACKLOG.md` for the remaining epics (live RAG,
-OpenHands sandbox runtime, Supabase auth, billing).
+render their product surfaces. The app is **auth-gated** with an organization switcher (Supabase-ready),
+and Chat OS persists multiple conversations. The `orchestrator`, `memory`, and `rag` services have
+functional logic with passing unit tests. See `docs/MASTER_BACKLOG.md` for remaining epics (live RAG
+with Qdrant, OpenHands sandbox runtime, Supabase auth, billing).
+
+**Live:** https://gsmaxall.vercel.app
