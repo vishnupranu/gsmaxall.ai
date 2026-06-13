@@ -40,9 +40,11 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 ## EPIC 3 — Memory & Knowledge OS  `partial`
 - [x] Knowledge base UI (create KB, upload, list) + Memory search UI, persisted locally.
 - [x] `services/memory` semantic CRUD + cosine search (in-memory vector store, org-scoped, tested).
-- [x] `services/rag` ingest/chunk/embed/retrieve/cite (in-memory index, tested).
-- [ ] Swap in-memory store for Qdrant + provider embeddings (set QDRANT_URL).
-- **Exit:** chat can ground answers on uploaded docs with citations.  *(UI live; vector backend pending)*
+- [x] `services/rag` ingest/chunk/embed/retrieve/cite (vector index, tested).
+- [x] **Qdrant** backend for `memory` + `rag` (org-scoped, payload-filtered) with in-memory fallback — set `QDRANT_URL`. No SQL.
+- [x] **Excel (.xlsx) + CSV ingestion**: rows parsed → embedded as vectors (`/v1/ingest/file`; Knowledge OS upload in web).
+- [ ] Provider embeddings (swap hashed embed for the provider router when a key is set).
+- **Exit:** chat can ground answers on uploaded docs with citations.  *(vector DB + Excel/CSV live; provider embeddings pending B2)*
 
 ## EPIC 4 — Developer OS  `todo`
 - [ ] Integrate OpenHands SDK in `services/agents` (sandboxed).

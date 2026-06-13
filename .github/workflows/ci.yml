@@ -30,6 +30,9 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r requirements-dev.txt "fastapi==0.115.6" "pydantic==2.10.4"
+      - name: Install service requirements
+        run: |
+          for req in services/*/requirements.txt; do pip install -r "$req"; done
       - name: Run service test suites
         run: |
           set -e

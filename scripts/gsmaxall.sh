@@ -33,6 +33,9 @@ run_py() {
   step "Installing Python deps"
   python3 -m pip install -q -r requirements-dev.txt
   python3 -m pip install -q "fastapi==0.115.6" "pydantic==2.10.4"
+  for req in services/*/requirements.txt; do
+    python3 -m pip install -q -r "$req"
+  done
   local failed=0 total=0
   for svc in services/*/; do
     if [ -d "${svc}tests" ]; then

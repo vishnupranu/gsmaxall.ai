@@ -10,15 +10,14 @@ import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from .store import VectorStore
+from .store import get_store
 
 SERVICE_NAME = "memory"
 SERVICE_PORT = int(os.environ.get("PORT", "8082"))
 
 app = FastAPI(title=f"GSMAXALL {SERVICE_NAME}", version="0.1.0")
-store = VectorStore()
-
-BACKEND = "qdrant" if os.environ.get("QDRANT_URL") else "in-memory"
+store = get_store()
+BACKEND = store.backend
 
 
 class UpsertRequest(BaseModel):

@@ -1,24 +1,24 @@
 """GSMAXALL — rag service.
 
-Knowledge OS: document ingest, chunk, retrieve, cite. In-memory index for
-demo/local runs; swap for Qdrant + provider embeddings when configured.
+Knowledge OS: document + tabular (Excel/CSV) ingest, chunk, retrieve, cite.
+Vector-DB backed (Qdrant via QDRANT_URL; in-memory fallback). No SQL.
 """
 from __future__ import annotations
 
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File, Form, UploadFile
 from pydantic import BaseModel
 
-from .rag import RagIndex
+from .rag import get_index
+from .tabular import parse_tabular
 
 SERVICE_NAME = "rag"
 SERVICE_PORT = int(os.environ.get("PORT", "8083"))
 
 app = FastAPI(title=f"GSMAXALL {SERVICE_NAME}", version="0.1.0")
-index = RagIndex()
-
-BACKEND = "qdrant" if os.environ.get("QDRANT_URL") else "in-memory"
+index = get_index()
+BACKEND = index.backend
 
 
 class IngestRequest(BaseModel):
@@ -41,6 +41,17 @@ def health() -> dict[str, str]:
 @app.post("/v1/ingest")
 def ingest(req: IngestRequest) -> dict:
     return index.ingest(req.org_id, req.source, req.text)
+
+
+@app.post("/v1/ingest/file")
+async def ingest_file(org_id: str = Form(...), file: UploadFile = File(...)) -> dict:
+    """Ingest an Excel (.xlsx) or CSV file: each row is embedded as a chunk."""
+    data = await file.read()
+    rows = parse_tabular(file.filename or "upload", data)
+    text = "\n".join(rows)
+    result = index.ingest(org_id, file.filename or "upload", text)
+    result["rows"] = len(rows)
+    return result
 
 
 @app.post("/v1/query")
