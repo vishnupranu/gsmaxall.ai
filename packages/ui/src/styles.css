@@ -1,0 +1,50 @@
+/* GSMAXALL design tokens — drives dark/light theming via [data-theme]. */
+
+:root,
+[data-theme="dark"] {
+  --gs-bg: #0b0d12;
+  --gs-bg-elev: #14171f;
+  --gs-border: #232733;
+  --gs-text: #e7e9ee;
+  --gs-text-muted: #9aa1ad;
+  --gs-accent-from: #6366f1;
+  --gs-accent-to: #22d3ee;
+}
+
+[data-theme="light"] {
+  --gs-bg: #f7f8fa;
+  --gs-bg-elev: #ffffff;
+  --gs-border: #e4e7ec;
+  --gs-text: #0b0d12;
+  --gs-text-muted: #5b6471;
+  --gs-accent-from: #6366f1;
+  --gs-accent-to: #0891b2;
+}
+
+.gs-btn {
+  font: inherit;
+  border: 1px solid var(--gs-border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.gs-btn--primary {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(90deg, var(--gs-accent-from), var(--gs-accent-to));
+}
+
+.gs-btn--primary:hover {
+  opacity: 0.9;
+}
+
+.gs-btn--ghost {
+  background: transparent;
+  color: var(--gs-text);
+}
+
+.gs-btn--ghost:hover {
+  background: var(--gs-bg-elev);
+}
