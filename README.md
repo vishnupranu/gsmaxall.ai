@@ -1,0 +1,1 @@
+# gsmaxall.ai
