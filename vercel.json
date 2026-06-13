@@ -1,0 +1,65 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install --ignore-scripts",
+  "devCommand": "npm run dev",
+  "cleanUrls": true,
+  "experimentalServices": {
+    "web": {
+      "root": "apps/web",
+      "routePrefix": "/",
+      "framework": "nextjs"
+    },
+    "admin": {
+      "root": "services/admin",
+      "entrypoint": "app.main:app",
+      "routePrefix": "/_/admin"
+    },
+    "agents": {
+      "root": "services/agents",
+      "entrypoint": "app.main:app",
+      "routePrefix": "/_/agents"
+    },
+    "analytics": {
+      "root": "services/analytics",
+      "entrypoint": "app.main:app",
+      "routePrefix": "/_/analytics"
+    },
+    "media": {
+      "root": "services/media",
+      "entrypoint": "app.main:app",
+      "routePrefix": "/_/media"
+    },
+    "memory": {
+      "root": "services/memory",
+      "entrypoint": "app.main:app",
+      "routePrefix": "/_/memory"
+    },
+    "orchestrator": {
+      "root": "services/orchestrator",
+      "entrypoint": "app.main:app",
+      "routePrefix": "/_/orchestrator"
+    },
+    "rag": {
+      "root": "services/rag",
+      "entrypoint": "app.main:app",
+      "routePrefix": "/_/rag"
+    },
+    "research": {
+      "root": "services/research",
+      "entrypoint": "app.main:app",
+      "routePrefix": "/_/research"
+    },
+    "search": {
+      "root": "services/search",
+      "entrypoint": "app.main:app",
+      "routePrefix": "/_/search"
+    },
+    "workflows": {
+      "root": "services/workflows",
+      "entrypoint": "app.main:app",
+      "routePrefix": "/_/workflows"
+    }
+  }
+}
