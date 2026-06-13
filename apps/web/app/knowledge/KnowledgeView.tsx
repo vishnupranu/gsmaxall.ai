@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button, Card, Input, EmptyState, Badge } from "@gsmaxall/ui";
+import { useLocalState } from "../lib/useLocalState";
 
 interface KB {
   id: string;
@@ -11,7 +12,7 @@ interface KB {
 }
 
 export function KnowledgeView() {
-  const [bases, setBases] = useState<KB[]>([
+  const [bases, setBases] = useLocalState<KB[]>("gsmaxall.knowledge.v1", [
     { id: "kb1", name: "Product Docs", chunks: 128, files: ["overview.md", "api.md"] },
   ]);
   const [name, setName] = useState("");

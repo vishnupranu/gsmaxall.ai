@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo, useTheme } from "@gsmaxall/ui";
 import { MODULES } from "../modules";
+import { AuthGate } from "./AuthGate";
+import { OrgMenu } from "./OrgMenu";
 import type { ReactNode } from "react";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -11,6 +13,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { theme, toggle } = useTheme();
 
   return (
+    <AuthGate>
     <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", height: "100vh" }}>
       <aside
         style={{
@@ -75,11 +78,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             borderBottom: "1px solid var(--gs-border)",
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
             padding: "0 18px",
             gap: 12,
           }}
         >
+          <OrgMenu />
           <button
             onClick={toggle}
             className="gs-btn gs-btn--ghost"
@@ -92,6 +96,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div style={{ flex: 1, overflow: "auto" }}>{children}</div>
       </main>
     </div>
+    </AuthGate>
   );
 }
 

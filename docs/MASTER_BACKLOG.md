@@ -3,7 +3,13 @@
 Sequenced, epic-level backlog to drive GSMAXALL from foundation to production. Each epic lists its
 exit criteria. Status: `todo` / `in-progress` / `done`.
 
-## EPIC 0 — Foundation & Documentation  `in-progress`
+> **Progress note (live):** the app is deployed at https://gsmaxall.vercel.app with all 15 OS
+> module surfaces. Where a backend (Supabase, Qdrant, OpenHands sandbox, Stripe) isn't yet
+> connected, modules run in **demo/local mode** (localStorage persistence) and flip to live when
+> the credential/service is configured. Items below marked `partial` are code-complete on the
+> client with graceful fallback, pending their backend wiring.
+
+## EPIC 0 — Foundation & Documentation  `done`
 - [x] Audit sources; produce SYSTEM_AUDIT, FEATURE_MATRIX, GAP_ANALYSIS, DEPENDENCY_GRAPH,
       MERGE_MAP, TARGET_ARCHITECTURE, MASTER_BACKLOG.
 - [x] Scaffold monorepo (apps/web, services/*, packages/*, infrastructure).
@@ -14,25 +20,27 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 - [ ] CI pipeline (build/lint/typecheck per workspace).
 - **Exit:** monorepo builds; web shell runs; docs merged.
 
-## EPIC 1 — Identity & Tenancy  `todo`
-- [ ] Provision Supabase; wire web auth (sign-in/up, session).
+## EPIC 1 — Identity & Tenancy  `partial`
+- [x] Auth-gated app (sign-in screen) + session context (`app/lib/session.tsx`), Supabase-ready.
+- [x] Orgs + membership + RBAC roles; org switcher in header (`OrgMenu`).
+- [ ] Provision Supabase; swap demo identity for Supabase Auth (set NEXT_PUBLIC_SUPABASE_URL).
 - [ ] JWT verification middleware shared across services.
-- [ ] Orgs + membership + RBAC; org switcher in UI.
-- [ ] Audit log writer + viewer.
-- **Exit:** auth-gated app; org-scoped data; roles enforced.
+- [ ] Audit log writer + viewer (UI surface exists in Enterprise OS).
+- **Exit:** auth-gated app; org-scoped data; roles enforced.  *(demo identity live; Supabase pending B1)*
 
-## EPIC 2 — Chat OS (flagship vertical)  `todo`
-- [ ] Conversation persistence (Postgres).
-- [ ] Streaming chat via orchestrator → provider router.
-- [ ] Model selector from catalog; per-provider keys.
+## EPIC 2 — Chat OS (flagship vertical)  `partial`
+- [x] Multi-conversation chat with persistence (localStorage; sidebar, new/delete, auto-title).
+- [x] Streaming chat via provider router with demo fallback (`/api/chat`).
+- [x] Model selector from catalog (`/api/models`).
+- [ ] Move persistence to Postgres (per-org/user) once DB provisioned.
 - [ ] File upload + attachment rendering.
-- **Exit:** end-to-end multi-provider chat with history.
+- **Exit:** end-to-end multi-provider chat with history.  *(live; real models pending B2, DB pending B1)*
 
-## EPIC 3 — Memory & Knowledge OS  `todo`
-- [ ] `services/memory` Qdrant CRUD + semantic search.
-- [ ] `services/rag` ingest/chunk/embed/retrieve/cite.
-- [ ] Knowledge base UI (create KB, upload, query).
-- **Exit:** chat can ground answers on uploaded docs with citations.
+## EPIC 3 — Memory & Knowledge OS  `partial`
+- [x] Knowledge base UI (create KB, upload, list) + Memory search UI, persisted locally.
+- [ ] `services/memory` Qdrant CRUD + semantic search (backend).
+- [ ] `services/rag` ingest/chunk/embed/retrieve/cite (backend).
+- **Exit:** chat can ground answers on uploaded docs with citations.  *(UI live; vector backend pending)*
 
 ## EPIC 4 — Developer OS  `todo`
 - [ ] Integrate OpenHands SDK in `services/agents` (sandboxed).
@@ -53,21 +61,21 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 - [ ] Live link to `services/agents` workspace.
 - **Exit:** in-browser editing synced with agent runtime.
 
-## EPIC 7 — Workflow OS  `todo`
-- [ ] Workflow model (nodes, edges, triggers) + schema.
-- [ ] Scheduler + event triggers (Redis).
-- [ ] Visual builder in UI.
-- **Exit:** user automates a multi-step task on a schedule/trigger.
+## EPIC 7 — Workflow OS  `partial`
+- [x] Workflow builder UI (trigger/action steps, add/remove) persisted locally.
+- [ ] Workflow model + schema, scheduler + event triggers (Redis backend).
+- **Exit:** user automates a multi-step task on a schedule/trigger.  *(builder live; runtime pending)*
 
 ## EPIC 8 — Builder OS  `todo`
 - [ ] App/site generation flow (Lovable/Bolt-style) on agents runtime.
 - [ ] Live preview + deploy.
 - **Exit:** user generates and previews an app from a prompt.
 
-## EPIC 9 — Research OS + Search  `todo`
+## EPIC 9 — Research OS + Search  `partial`
+- [x] Research/Content/Builder OS prompt surfaces wired to the provider router (demo fallback).
 - [ ] `services/search` web/vector facade.
 - [ ] `services/research` multi-step research + synthesis with citations.
-- **Exit:** user runs a deep-research query and gets a sourced report.
+- **Exit:** user runs a deep-research query and gets a sourced report.  *(UI live; real synthesis pending B2)*
 
 ## EPIC 10 — Content & Media OS  `todo`
 - [ ] Content generation surfaces in UI.

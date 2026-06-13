@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button, Card, Input, Badge } from "@gsmaxall/ui";
+import { useLocalState } from "../lib/useLocalState";
 
 interface Step {
   id: string;
@@ -10,7 +11,7 @@ interface Step {
 }
 
 export function WorkflowView() {
-  const [steps, setSteps] = useState<Step[]>([
+  const [steps, setSteps] = useLocalState<Step[]>("gsmaxall.workflows.v1", [
     { id: "s1", type: "trigger", label: "On schedule (daily 9am)" },
     { id: "s2", type: "action", label: "Run Research OS query" },
     { id: "s3", type: "action", label: "Email summary report" },
