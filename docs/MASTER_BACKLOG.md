@@ -17,8 +17,9 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 - [x] Provider-router contract + base adapters in `packages/sdk`.
 - [x] Local infra `docker-compose.yml` (Postgres, Qdrant, Redis).
 - [x] Runnable web shell with GSMAXALL branding + dark/light mode.
-- [ ] CI pipeline (build/lint/typecheck per workspace).
-- **Exit:** monorepo builds; web shell runs; docs merged.
+- [x] CI pipeline (GitHub Actions: JS build/lint/typecheck + Python pytest) — `.github/workflows/ci.yml`.
+- [x] One-shot pipeline script `scripts/gsmaxall.sh` (js | py | all).
+- **Exit:** monorepo builds; web shell runs; docs merged.  *(done)*
 
 ## EPIC 1 — Identity & Tenancy  `partial`
 - [x] Auth-gated app (sign-in screen) + session context (`app/lib/session.tsx`), Supabase-ready.
@@ -65,8 +66,9 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 
 ## EPIC 7 — Workflow OS  `partial`
 - [x] Workflow builder UI (trigger/action steps, add/remove) persisted locally.
-- [ ] Workflow model + schema, scheduler + event triggers (Redis backend).
-- **Exit:** user automates a multi-step task on a schedule/trigger.  *(builder live; runtime pending)*
+- [x] `services/workflows` in-memory engine: create/list/run with a run log (tested).
+- [ ] Persist to Postgres; Redis-backed scheduler + event triggers.
+- **Exit:** user automates a multi-step task on a schedule/trigger.  *(builder + engine live; scheduler pending)*
 
 ## EPIC 8 — Builder OS  `todo`
 - [ ] App/site generation flow (Lovable/Bolt-style) on agents runtime.
@@ -75,9 +77,10 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 
 ## EPIC 9 — Research OS + Search  `partial`
 - [x] Research/Content/Builder OS prompt surfaces wired to the provider router (demo fallback).
-- [ ] `services/search` web/vector facade.
-- [ ] `services/research` multi-step research + synthesis with citations.
-- **Exit:** user runs a deep-research query and gets a sourced report.  *(UI live; real synthesis pending B2)*
+- [x] `services/search` keyword + vector facade over an in-memory corpus (tested).
+- [x] `services/research` plan → gather → synthesize pipeline with citations (tested).
+- [ ] Back search with a real web/vector provider; synthesize via provider router in live mode.
+- **Exit:** user runs a deep-research query and gets a sourced report.  *(pipeline live; real sources pending)*
 
 ## EPIC 10 — Content & Media OS  `todo`
 - [ ] Content generation surfaces in UI.
@@ -90,7 +93,8 @@ exit criteria. Status: `todo` / `in-progress` / `done`.
 - [ ] Plugin/agent marketplace (plugin-sdk).
 - **Exit:** orgs can subscribe, manage members, install marketplace plugins.
 
-## EPIC 12 — Hardening & Launch  `todo`
+## EPIC 12 — Hardening & Launch  `partial`
+- [x] CI/CD (GitHub Actions) + full-stack `docker-compose.full.yml` (web-less; all services + infra).
 - [ ] Observability (OpenTelemetry), rate limits, quotas.
 - [ ] Security review (authz, sandbox isolation, secrets).
 - [ ] Load/perf testing; CI/CD; production deploy.
